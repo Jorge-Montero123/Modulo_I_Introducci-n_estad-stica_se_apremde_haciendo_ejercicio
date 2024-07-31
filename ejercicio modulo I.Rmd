@@ -1,0 +1,59 @@
+---
+title: "Se_aprende_haciendo_modulo_I"
+author: "Jorge_Montero"
+date: "2024-07-26"
+output: github_document:
+    
+---
+#¿Cuál el top 5 de tiendas (promedio de ventas), para el año 2016, para la ciudad CEDAR RAPIDS?
+
+```{r}
+library(dplyr)
+
+data<-read.csv("C:/Users/Montero/Desktop/Betametrica/Iowa_Liquor_Sales.csv", stringsAsFactors = F,header = T)
+
+datos<-data %>% 
+  mutate(Sale..Dollars.=(as.numeric(substr(data$Sale..Dollars.,2,15))),
+         City=toupper(City),
+         Store.Name=toupper(Store.Name),
+         Date=as.Date(Date,format="%m/%d/%Y"),
+         anio=lubridate::year(Date)) %>%  
+  rename(ventas=Sale..Dollars., 
+         ciudad=City,
+         categoria=Category.Name,
+         nombre_tienda=Store.Name)
+
+datos %>% filter(ciudad=="CEDAR RAPIDS", anio=="2016") %>% 
+  group_by(nombre_tienda)%>% 
+  summarise(promedio=mean(ventas)) %>% 
+  arrange(-promedio) %>% 
+  top_n(5,promedio)
+
+
+```
+#¿Cuáles fueron los 5 últimos vendedores (promedio de ventas, para el 2016, para DAVENPORT)? 
+```{r}
+datos %>% filter(ciudad=="DAVENPORT", anio=="2016") %>% 
+  group_by(Vendor.Name)%>% 
+  summarise(promedio=mean(ventas)) %>% 
+  arrange(-promedio) %>% 
+  top_n(-5,promedio)
+```
+#¿Cuál es el top 5 de productos más vendidos, para el 2016 y 2017, por ciudad?
+
+```{r}
+
+datos %>% select(ciudad,anio,Item.Description) %>%
+  filter( anio=="2016"| anio=="2017") %>% 
+  group_by(ciudad,anio,Item.Description) %>% 
+  summarise(conteo=n()) %>% 
+  top_n(6,conteo)
+                        
+
+
+
+```
+
+
+
+
